@@ -1,84 +1,66 @@
-# CloudBooth
+# FileBooth – Swift Executable
 
-A macOS application that automatically syncs your Photo Booth pictures to iCloud Drive with a simple click.
+This is the **Swift executable version** of the [CloudBooth](https://github.com/Navaneeth-Git/CloudBooth) app — a lightweight macOS utility that syncs your Photo Booth photos to iCloud Drive.
 
-![CloudBooth App](https://github.com/yourusername/CloudBooth/raw/main/screenshots/app-screenshot.png)
+> 💡 If you want the full-featured macOS menu bar app version, visit the main repository here:  
+> 👉 [CloudBooth on GitHub](https://github.com/Navaneeth-Git/CloudBooth)
 
-## Features
+---
 
-- One-click sync from Photo Booth Library to iCloud Drive
-- Progress tracking of file operations with detailed status updates
-- Automatic folder creation in iCloud Drive
-- Skip already synced files to avoid duplicates
-- Menu bar support with keyboard shortcuts
-- Native macOS UI with SwiftUI
+## 🧱 What This Is
 
-## Requirements
+This version contains a precompiled Swift command-line executable that mirrors the core syncing functionality of CloudBooth:
+
+- Copies photos and videos from your **Photo Booth Library**
+- Uploads them into a `photobooth` folder in **iCloud Drive**
+- Skips duplicates for efficient syncing
+
+This is ideal for advanced users who prefer CLI utilities or automation.
+
+---
+
+## 📂 File Paths Used
+
+- **Source Folder**  
+  `/Users/[username]/Pictures/Photo Booth Library/Pictures`
+
+- **Destination Folder**  
+  `/Users/[username]/Library/Mobile Documents/com~apple~CloudDocs/photobooth`
+
+---
+
+## ⚙️ Requirements
 
 - macOS 13.0 or later
-- Xcode 15.0 or later
-- Swift 6.1 or later
+- iCloud Drive enabled
+- Terminal permission to access the required folders
 
-## Installation
+---
 
-### Option 1: Build from Source
+## 🚀 How to Run
 
-1. Clone this repository:
-   ```
-   git clone https://github.com/yourusername/CloudBooth.git
-   cd CloudBooth
-   ```
+After downloading and extracting:
 
-2. Build the application using Swift Package Manager:
-   ```
-   swift build
-   ```
+```bash
+chmod +x FileBooth
+./FileBooth
+```
 
-3. Run the application:
-   ```
-   swift run
-   ```
+You’ll be prompted to grant permission to access the Photos and iCloud Drive folders during first use.
 
-### Option 2: Using Xcode
+---
 
-1. Open the project in Xcode:
-   ```
-   xed .
-   ```
+## 🔐 Permissions
 
-2. Build and run using Xcode's Run button (⌘R)
+This app **never uploads your files to any third-party services**.  
+It simply **copies your Photo Booth content from your local library to your iCloud Drive**.
 
-## Usage
+---
 
-1. Launch the CloudBooth application
-2. Click the "Sync Now" button or use the keyboard shortcut (⌘S)
-3. Grant permission to access your Photo Booth library and iCloud Drive when prompted
-4. Wait for the sync to complete
+## 📜 License
 
-The app will create a "photobooth" folder in your iCloud Drive and copy all Photo Booth photos there.
+This project is licensed under the [Apache License 2.0](LICENSE).
 
-## File Paths
+---
 
-- Source: `/Users/[username]/Pictures/Photo Booth Library/Pictures`
-- Destination: `/Users/[username]/Library/Mobile Documents/com~apple~CloudDocs/photobooth`
-
-## Permissions
-
-The application requires access to:
-- Your Photo Booth library
-- Your iCloud Drive
-
-You'll be prompted to grant these permissions when you first run the app.
-
-## Keyboard Shortcuts
-
-- ⌘S: Sync Now
-- ⌘R: Refresh/Check Permissions
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is open source and available under the MIT License. 
+© 2025 Navaneeth
