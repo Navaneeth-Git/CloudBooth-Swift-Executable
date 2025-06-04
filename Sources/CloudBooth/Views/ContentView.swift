@@ -228,14 +228,14 @@ struct ContentView: View {
                 
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Image(systemName: "folder.badge.gearshape")
+                        Image(systemName: settings.useCustomDestination ? "folder.badge.gearshape" : "icloud")
                             .foregroundStyle(.blue)
                         Text("Destination")
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
                     
-                    Text("iCloud Drive")
+                    Text(settings.useCustomDestination ? "Custom Location" : "iCloud Drive")
                         .font(.caption)
                     
                     Text("CloudBooth folder")
@@ -535,9 +535,12 @@ struct ContentView: View {
         // Create FileManager
         let fileManager = FileManager.default
         
-        // Destination base directory in iCloud
-        let iCloudBase = "/Users/navaneeth/Library/Mobile Documents/com~apple~CloudDocs"
-        let cloudBoothFolder = "\(iCloudBase)/CloudBooth"
+        // Get the home directory for the current user
+        let homeDirectory = fileManager.homeDirectoryForCurrentUser.path
+        
+        // Get base destination directory (either iCloud or custom location)
+        let destinationBase = settings.getDestinationBasePath()
+        let cloudBoothFolder = "\(destinationBase)/CloudBooth"
         
         // Create the main CloudBooth folder if it doesn't exist
         if !fileManager.fileExists(atPath: cloudBoothFolder) {
@@ -546,7 +549,7 @@ struct ContentView: View {
         
         // Create tasks to sync both folders in parallel
         async let originalsTask = syncFolder(
-            sourceFolder: "/Users/navaneeth/Pictures/Photo Booth Library/Originals",
+            sourceFolder: "\(homeDirectory)/Pictures/Photo Booth Library/Originals",
             destFolder: "\(cloudBoothFolder)/Originals",
             updateStats: { stats in
                 await MainActor.run {
@@ -568,7 +571,7 @@ struct ContentView: View {
         )
         
         async let picturesTask = syncFolder(
-            sourceFolder: "/Users/navaneeth/Pictures/Photo Booth Library/Pictures",
+            sourceFolder: "\(homeDirectory)/Pictures/Photo Booth Library/Pictures",
             destFolder: "\(cloudBoothFolder)/Pictures",
             updateStats: { stats in
                 await MainActor.run {

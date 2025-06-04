@@ -66,6 +66,21 @@ class Settings: ObservableObject {
         }
     }
     
+    // Custom destination path
+    @Published var useCustomDestination: Bool = false {
+        didSet {
+            UserDefaults.standard.setValue(useCustomDestination, forKey: "useCustomDestination")
+        }
+    }
+    
+    @Published var customDestinationPath: String? {
+        didSet {
+            if let path = customDestinationPath {
+                UserDefaults.standard.setValue(path, forKey: "customDestinationPath")
+            }
+        }
+    }
+    
     // Last sync date for display and calculations
     @Published var lastSyncDate: Date? {
         didSet {
@@ -87,10 +102,13 @@ class Settings: ObservableObject {
     
     private var timer: Timer?
     private var fileMonitors: [DispatchSourceFileSystemObject] = []
-    private var monitoredFolders: [String] = [
-        "/Users/navaneeth/Pictures/Photo Booth Library/Pictures",
-        "/Users/navaneeth/Pictures/Photo Booth Library/Originals"
-    ]
+    private var monitoredFolders: [String] {
+        let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
+        return [
+            "\(homeDirectory)/Pictures/Photo Booth Library/Pictures",
+            "\(homeDirectory)/Pictures/Photo Booth Library/Originals"
+        ]
+    }
     
     private init() {
         loadSettings()
@@ -102,6 +120,10 @@ class Settings: ObservableObject {
            let interval = SyncInterval(rawValue: intervalString) {
             autoSyncInterval = interval
         }
+        
+        // Load custom destination settings
+        useCustomDestination = UserDefaults.standard.bool(forKey: "useCustomDestination")
+        customDestinationPath = UserDefaults.standard.string(forKey: "customDestinationPath")
         
         // Load last sync date
         lastSyncDate = UserDefaults.standard.object(forKey: "lastSyncDate") as? Date
@@ -241,6 +263,17 @@ class Settings: ObservableObject {
                 print("Failed to load sync history: \(error)")
                 syncHistory = []
             }
+        }
+    }
+    
+    // Get the destination base path based on user preference
+    func getDestinationBasePath() -> String {
+        if useCustomDestination, let customPath = customDestinationPath {
+            return customPath
+        } else {
+            // Default iCloud path
+            let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
+            return "\(homeDirectory)/Library/Mobile Documents/com~apple~CloudDocs"
         }
     }
 } 

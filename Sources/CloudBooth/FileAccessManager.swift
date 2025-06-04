@@ -37,15 +37,18 @@ class FileAccessManager {
         // Simulate an async operation by adding a small delay
         try? await Task.sleep(nanoseconds: 10_000_000) // 0.01 second
         
+        // Get the home directory for the current user
+        let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
+        
         // Source directories
-        let originalsPath = "/Users/navaneeth/Pictures/Photo Booth Library/Originals"
+        let originalsPath = "\(homeDirectory)/Pictures/Photo Booth Library/Originals"
         let originalsURL = URL(fileURLWithPath: originalsPath)
         
-        let picturesPath = "/Users/navaneeth/Pictures/Photo Booth Library/Pictures"
+        let picturesPath = "\(homeDirectory)/Pictures/Photo Booth Library/Pictures"
         let picturesURL = URL(fileURLWithPath: picturesPath)
         
-        // Destination directory
-        let destinationBase = "/Users/navaneeth/Library/Mobile Documents/com~apple~CloudDocs"
+        // Destination directory - iCloud Drive path
+        let destinationBase = "\(homeDirectory)/Library/Mobile Documents/com~apple~CloudDocs"
         let destinationURL = URL(fileURLWithPath: destinationBase)
         
         // Request access to all directories

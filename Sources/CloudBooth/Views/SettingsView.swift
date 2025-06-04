@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct SettingsView: View {
     @EnvironmentObject var settings: Settings
@@ -86,27 +87,68 @@ struct SettingsView: View {
                                 .font(.headline)
                                 .padding(.bottom, 2)
                             
-                            Text("Your files will be synced to:")
+                            Text("Choose where to save your Photo Booth files")
                                 .font(.callout)
                                 .foregroundStyle(.secondary)
                             
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "folder")
-                                        .foregroundStyle(.blue)
-                                        .imageScale(.small)
-                                    
-                                    Text("iCloud Drive")
-                                        .font(.callout)
-                                        .fontWeight(.medium)
+                            // Destination options
+                            VStack(alignment: .leading, spacing: 12) {
+                                // iCloud option
+                                Toggle(isOn: Binding(
+                                    get: { !settings.useCustomDestination },
+                                    set: { settings.useCustomDestination = !$0 }
+                                )) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "icloud")
+                                            .foregroundStyle(.blue)
+                                            .imageScale(.small)
+                                        
+                                        Text("iCloud Drive")
+                                            .font(.callout)
+                                            .fontWeight(.medium)
+                                    }
                                 }
                                 
-                                Text("/Users/navaneeth/Library/Mobile Documents/com~apple~CloudDocs/CloudBooth")
-                                    .font(.system(.callout, design: .monospaced))
-                                    .padding(8)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color(.textBackgroundColor))
-                                    .cornerRadius(4)
+                                if !settings.useCustomDestination {
+                                    Text("\(FileManager.default.homeDirectoryForCurrentUser.path)/Library/Mobile Documents/com~apple~CloudDocs/CloudBooth")
+                                        .font(.system(.callout, design: .monospaced))
+                                        .padding(8)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color(.textBackgroundColor))
+                                        .cornerRadius(4)
+                                }
+                                
+                                // Custom location option
+                                Toggle(isOn: $settings.useCustomDestination) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "folder")
+                                            .foregroundStyle(.orange)
+                                            .imageScale(.small)
+                                        
+                                        Text("Custom Location")
+                                            .font(.callout)
+                                            .fontWeight(.medium)
+                                    }
+                                }
+                                
+                                if settings.useCustomDestination {
+                                    HStack {
+                                        Text(settings.customDestinationPath ?? "No folder selected")
+                                            .font(.system(.callout, design: .monospaced))
+                                            .lineLimit(1)
+                                            .truncationMode(.middle)
+                                            .padding(8)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .background(Color(.textBackgroundColor))
+                                            .cornerRadius(4)
+                                        
+                                        Button("Choose...") {
+                                            selectCustomFolder()
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        .controlSize(.small)
+                                    }
+                                }
                             }
                             
                             // Path information
@@ -135,8 +177,22 @@ struct SettingsView: View {
             }
             .background(Color(.windowBackgroundColor))
         }
-        .frame(width: 480, height: 460)
+        .frame(width: 480, height: 520)
         .background(Color(.windowBackgroundColor))
+    }
+    
+    private func selectCustomFolder() {
+        let openPanel = NSOpenPanel()
+        openPanel.title = "Select Destination Folder"
+        openPanel.message = "Choose where to save your Photo Booth files"
+        openPanel.showsResizeIndicator = true
+        openPanel.canChooseDirectories = true
+        openPanel.canChooseFiles = false
+        openPanel.allowsMultipleSelection = false
+        
+        if openPanel.runModal() == .OK, let url = openPanel.url {
+            settings.customDestinationPath = url.path
+        }
     }
     
     private func syncIntervalButton(_ interval: SyncInterval) -> some View {
