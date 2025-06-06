@@ -77,6 +77,19 @@ class Settings: ObservableObject {
         didSet {
             if let path = customDestinationPath {
                 UserDefaults.standard.setValue(path, forKey: "customDestinationPath")
+                
+                // Save security-scoped bookmark for the custom destination
+                let url = URL(fileURLWithPath: path)
+                do {
+                    let bookmarkData = try url.bookmarkData(
+                        options: .withSecurityScope,
+                        includingResourceValuesForKeys: nil,
+                        relativeTo: nil
+                    )
+                    UserDefaults.standard.set(bookmarkData, forKey: "customDestinationBookmark")
+                } catch {
+                    print("Failed to save bookmark for custom destination: \(error)")
+                }
             }
         }
     }
@@ -213,7 +226,7 @@ class Settings: ObservableObject {
             
             let source = DispatchSource.makeFileSystemObjectSource(
                 fileDescriptor: fileDescriptor,
-                eventMask: .write,
+                eventMask: [.write, .extend, .attrib, .rename],
                 queue: .main
             )
             
@@ -271,9 +284,32 @@ class Settings: ObservableObject {
         if useCustomDestination, let customPath = customDestinationPath {
             return customPath
         } else {
-            // Default iCloud path
-            let homeDirectory = FileManager.default.homeDirectoryForCurrentUser.path
-            return "\(homeDirectory)/Library/Mobile Documents/com~apple~CloudDocs"
+            // Always use explicit user directory path for iCloud, avoiding container paths
+            return FileAccessManager.shared.getICloudDirectory()
         }
+    }
+    
+    // Access custom destination with security-scoped bookmark
+    func accessCustomDestination() -> URL? {
+        guard useCustomDestination,
+              let bookmarkData = UserDefaults.standard.data(forKey: "customDestinationBookmark") else {
+            return nil
+        }
+        
+        var isStale = false
+        do {
+            let url = try URL(resolvingBookmarkData: bookmarkData,
+                            options: .withSecurityScope,
+                            relativeTo: nil,
+                            bookmarkDataIsStale: &isStale)
+            
+            if url.startAccessingSecurityScopedResource() {
+                return url
+            }
+        } catch {
+            print("Failed to resolve custom destination bookmark: \(error)")
+        }
+        
+        return nil
     }
 } 

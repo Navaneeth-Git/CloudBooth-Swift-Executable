@@ -17,7 +17,7 @@ let package = Package(
             path: "Sources/CloudBooth",
             resources: [
                 .process("Assets.xcassets")
-            ]
-        )
+    ]
+)
     ]
 )

@@ -110,7 +110,7 @@ struct SettingsView: View {
                                 }
                                 
                                 if !settings.useCustomDestination {
-                                    Text("\(FileManager.default.homeDirectoryForCurrentUser.path)/Library/Mobile Documents/com~apple~CloudDocs/CloudBooth")
+                                    Text("\(FileAccessManager.shared.getICloudDirectory())/CloudBooth")
                                         .font(.system(.callout, design: .monospaced))
                                         .padding(8)
                                         .frame(maxWidth: .infinity, alignment: .leading)
